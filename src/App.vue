@@ -95,6 +95,7 @@ export default {
         console.error("Failed to fetch orders:", error);
       }
     },
+
     statusClass(statusId) {
       return {
         'status-completed': statusId === 4,

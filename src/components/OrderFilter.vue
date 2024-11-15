@@ -7,36 +7,56 @@
     <div>
       <input v-model="filter.dateFrom" type="date" placeholder="Дата с" />
       <input v-model="filter.dateTo" type="date" placeholder="Дата по" />
-      <select v-model="filter.status" >
-        <option value="4">Заказ выполнен</option>
-        <option value="5">Заказ отменен</option>
-        <option value="6">Заказ зарезервирован</option>
-      </select>
+      <multiselect
+          v-model="filter.status"
+          :options="statusOptions"
+          :multiple="true"
+          :close-on-select="false"
+          placeholder="Выберите статус"
+          track-by="value"
+          label="title"
+      ></multiselect>
       <button @click="searchByFilter">Искать</button>
     </div>
   </div>
 </template>
 
 <script>
-export default {
+  import Multiselect from 'vue-multiselect';
+  import 'vue-multiselect/dist/vue-multiselect.min.css';
+
+  export default {
+  components: {Multiselect},
   data() {
-    return {
-      filter: {
-        orderId: '',
-        dateFrom: '',
-        dateTo: '',
-        status: [],
-      },
-    };
-  },
-  methods: {
-    searchById() {
-      this.$emit('filterOrders', { orderId: this.filter.orderId });
-    },
-    searchByFilter() {
-      const { dateFrom, dateTo, status } = this.filter;
-      this.$emit('filterOrders', { dateFrom, dateTo, status: status.join(',') });
-    },
-  },
+  return {
+  filter: {
+  orderId: '',
+  dateFrom: '',
+  dateTo: '',
+  status: [], // статус должен быть массивом, так как multiselect возвращает массив
+},
+  statusOptions: [
+{value: '4', title: 'Заказ выполнен'},
+{value: '5', title: 'Заказ отменен'},
+{value: '6', title: 'Заказ зарезервирован'},
+  ],
 };
+},
+  methods: {
+  searchById() {
+  console.log('Ищем по ID:', this.filter.orderId);
+  this.$emit('filterOrders', {orderId: this.filter.orderId});
+},
+  searchByFilter() {
+  const {dateFrom, dateTo, status} = this.filter;
+
+  const statusValues = status ? status.map(item => item.value).join(',') : '';
+
+  this.$emit('filterOrders', {dateFrom, dateTo, status: statusValues});
+
+  console.log('Фильтры отправлены:', {dateFrom, dateTo, status: statusValues});
+},
+},
+};
+
 </script>
